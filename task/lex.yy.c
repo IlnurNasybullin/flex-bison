@@ -412,8 +412,8 @@ char *yytext;
 #include <stdio.h>
 #include "select.tab.h"
 
-int line_no = 1;
-int strcmp (const char* str1, const char* str2);
+int strcmp(const char* str1, const char* str2);
+extern int yylval = 1;
 #line 418 "lex.yy.c"
 
 /* Macros after this point can all be overridden by user definitions in
@@ -744,7 +744,7 @@ case 19:
 YY_RULE_SETUP
 #line 51 "select.l"
 {
-							line_no++;
+							yylval++;
 							printf("\n");
 						}
 	YY_BREAK

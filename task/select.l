@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include "select.tab.h"
 
-int line_no = 1;
-int strcmp (const char* str1, const char* str2);
+int strcmp(const char* str1, const char* str2);
+extern int yylval = 1;
 %}
 
 %option nodefault
@@ -49,7 +49,7 @@ IDENTIFICATOR_W			({LETTER}|_)({LETTER}|_|{DIGIT})*
 {COMMA_W}				return(COMMA);
 [ \t\r]					;
 \n						{
-							line_no++;
+							yylval++;
 							printf("\n");
 						}
 .						return(yytext[0]);
