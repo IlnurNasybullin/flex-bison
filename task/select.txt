@@ -1,0 +1,20 @@
+SELECT a FROM b;
+SELECT abc FROM abc;
+SELECT a, b, c FROM ABC;
+SELECT a, b, c FROM a, b, c;
+SELECT DISTINCT a FROM b;
+SELECT ALL b FROM a, b, c;
+SELECT * FROM a, b, c;
+SELECT * FROM A where b = 1;
+SELECT * FROM A WHERE c = 2 + 3;
+SELECT * FROM A WHERE c = (2 + 3);
+SELECT * FROM A WHERE (c = 2 + 3);
+SELECT * FROM A WHERE (c = (2 + 3));
+SELECT * FROM A WHERE (c = (2 + 3) AND (A >= 2));
+SELECT *
+FROM c
+WHERE (d = (2 + 3) AND (a >= 2 OR (NOT e = "QWERT
+						    yyd!l;,_=)+(!/*-\|")));
+SELECT _A FROM _B WHERE NOT A > 0 AND B < 0 OR A = (3 / 2 + (3 - -321 + 231.3123) + 1 + (2 / 0) - 1);
+SELECT a FROM b WHERE NOT NOT NOT b = c;
+SELECT a FROM b WHERE a < b + c;
