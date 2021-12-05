@@ -1,14 +1,5 @@
-Состояние 1 конфликты: 1 сдвига/вывода
-Состояние 4 конфликты: 1 сдвига/вывода
-Состояние 15 конфликты: 1 сдвига/вывода
-Состояние 18 конфликты: 1 сдвига/вывода
-Состояние 24 конфликты: 1 сдвига/вывода
-Состояние 32 конфликты: 1 сдвига/вывода
-Состояние 36 конфликты: 1 сдвига/вывода
-Состояние 61 конфликты: 1 сдвига/вывода
-Состояние 96 конфликты: 2 сдвига/вывода
-Состояние 102 конфликты: 2 сдвига/вывода
-Состояние 109 конфликты: 4 сдвига/вывода
+Состояние 65 конфликты: 2 сдвига/вывода
+Состояние 70 конфликты: 4 сдвига/вывода
 
 
 Грамматика
@@ -17,123 +8,103 @@
 
     1 select_list: select_list select
     2            | select
-    3            | select_list select error
-    4            | select error
 
-    5 select: select_part from_part where_part SQL_END
-    6       | error from_part where_part SQL_END
-    7       | select_part error where_part SQL_END
-    8       | select_part from_part error SQL_END
-    9       | select_part from_part where_part error
+    3 select: select_part from_part SQL_END
+    4       | select_part from_part where_part SQL_END
 
-   10 select_part: SELECT select_opt field_list
-   11            | error SELECT select_opt field_list
-   12            | error select_opt field_list
+    5 select_part: SELECT field_list
+    6            | SELECT select_opt field_list
 
-   13 field_list: '*'
-   14           | field_names
+    7 field_list: '*'
+    8           | field_names
 
-   15 field_names: field_names COMMA field_name
-   16            | field_name
-   17            | field_names error field_name
-   18            | error
+    9 field_names: field_names COMMA field_name
+   10            | field_name
 
-   19 field_name: IDENTIFICATOR
+   11 field_name: IDENTIFICATOR
 
-   20 from_part: FROM table_list
+   12 from_part: FROM table_list
 
-   21 $@1: /* пусто */
+   13 table_list: table_list COMMA table_name
+   14           | table_name
 
-   22 from_part: error table_list $@1 FROM error
+   15 table_name: IDENTIFICATOR
 
-   23 table_list: table_list COMMA table_name
-   24           | table_name
-   25           | table_list error table_name
-   26           | error
+   16 where_part: WHERE condition
 
-   27 table_name: IDENTIFICATOR
+   17 select_opt: DISTINCT
+   18           | ALL
 
-   28 where_part: /* пусто */
-   29           | WHERE condition
-   30           | error condition
-   31           | WHERE error
+   19 condition: predicate
+   20          | LB condition RB
+   21          | condition condition_operator condition
 
-   32 select_opt: /* пусто */
-   33           | DISTINCT
-   34           | ALL
+   22 predicate: NOT predicate
+   23          | field_value comparison field_value
 
-   35 condition: predicate
-   36          | LB condition RB
-   37          | condition condition_operator condition
-   38          | error condition RB
-   39          | LB error RB
-   40          | LB condition error
-   41          | error condition_operator condition
+   24 comparison: '='
+   25           | '<' '>'
+   26           | '<' '='
+   27           | '<'
+   28           | '>' '='
+   29           | '>'
 
-   42 predicate: NOT predicate
-   43          | field_value '=' field_value
-   44          | field_value '<' '>' field_value
-   45          | field_value '<' '=' field_value
-   46          | field_value '<' field_value
-   47          | field_value '>' '=' field_value
-   48          | field_value '>' field_value
+   30 field_value: value
 
-   49 field_value: value
+   31 condition_operator: AND
+   32                   | OR
 
-   50 condition_operator: AND
-   51                   | OR
+   33 value: STRING
+   34      | number_expression
+   35      | NULL_W
+   36      | DEFAULT
 
-   52 value: STRING
-   53      | number_expression
-   54      | NULL_W
-   55      | DEFAULT
+   37 number_expression: computable_expression
+   38                  | LB number_expression RB
+   39                  | number_expression number_operator number_expression
 
-   56 number_expression: computable_expression
-   57                  | LB number_expression RB
-   58                  | number_expression number_operator number_expression
+   40 computable_expression: number
+   41                      | IDENTIFICATOR
 
-   59 computable_expression: number
-   60                      | IDENTIFICATOR
+   42 number_operator: '+'
+   43                | '-'
+   44                | '*'
+   45                | '/'
 
-   61 number_operator: '+'
-   62                | '-'
-   63                | '*'
-   64                | '/'
+   46 number: negative_number
+   47       | POSITIVE_NUMBER
 
-   65 number: negative_number
-   66       | POSITIVE_NUMBER
-
-   67 negative_number: '-' POSITIVE_NUMBER
+   48 negative_number: '-' POSITIVE_NUMBER
 
 
 Терминальные символы с правилами, в которых они появляются
 
 $end (0) 0
-'*' (42) 13 63
-'+' (43) 61
-'-' (45) 62 67
-'/' (47) 64
-'<' (60) 44 45 46
-'=' (61) 43 45 47
-'>' (62) 44 47 48
-error (256) 3 4 6 7 8 9 11 12 17 18 22 25 26 30 31 38 39 40 41
-SELECT (258) 10 11
-FROM (259) 20 22
-COMMA (260) 15 23
-IDENTIFICATOR (261) 19 27 60
-WHERE (262) 29 31
-DISTINCT (263) 33
-ALL (264) 34
-LB (265) 36 39 40 57
-RB (266) 36 38 39 57
-NOT (267) 42
-AND (268) 50
-OR (269) 51
-NULL_W (270) 54
-DEFAULT (271) 55
-STRING (272) 52
-POSITIVE_NUMBER (273) 66 67
-SQL_END (274) 5 6 7 8
+'*' (42) 7 44
+'+' (43) 42
+'-' (45) 43 48
+'/' (47) 45
+'<' (60) 25 26 27
+'=' (61) 24 26 28
+'>' (62) 25 28 29
+error (256)
+SELECT (258) 5 6
+FROM (259) 12
+COMMA (260) 9 13
+IDENTIFICATOR (261) 11 15 41
+WHERE (262) 16
+DISTINCT (263) 17
+ALL (264) 18
+LB (265) 20 38
+RB (266) 20 38
+NOT (267) 22
+AND (268) 31
+OR (269) 32
+NULL_W (270) 35
+DEFAULT (271) 36
+STRING (272) 33
+POSITIVE_NUMBER (273) 47 48
+SQL_END (274) 3 4
 
 
 Нетерминальные символы с правилами, в которых они появляются
@@ -141,1364 +112,747 @@ SQL_END (274) 5 6 7 8
 $accept (27)
     налево: 0
 select_list (28)
-    налево: 1 2 3 4, направо: 0 1 3
+    налево: 1 2, направо: 0 1
 select (29)
-    налево: 5 6 7 8 9, направо: 1 2 3 4
+    налево: 3 4, направо: 1 2
 select_part (30)
-    налево: 10 11 12, направо: 5 7 8 9
+    налево: 5 6, направо: 3 4
 field_list (31)
-    налево: 13 14, направо: 10 11 12
+    налево: 7 8, направо: 5 6
 field_names (32)
-    налево: 15 16 17 18, направо: 14 15 17
+    налево: 9 10, направо: 8 9
 field_name (33)
-    налево: 19, направо: 15 16 17
+    налево: 11, направо: 9 10
 from_part (34)
-    налево: 20 22, направо: 5 6 8 9
-$@1 (35)
-    налево: 21, направо: 22
-table_list (36)
-    налево: 23 24 25 26, направо: 20 22 23 25
-table_name (37)
-    налево: 27, направо: 23 24 25
-where_part (38)
-    налево: 28 29 30 31, направо: 5 6 7 9
-select_opt (39)
-    налево: 32 33 34, направо: 10 11 12
-condition (40)
-    налево: 35 36 37 38 39 40 41, направо: 29 30 36 37 38 40 41
-predicate (41)
-    налево: 42 43 44 45 46 47 48, направо: 35 42
+    налево: 12, направо: 3 4
+table_list (35)
+    налево: 13 14, направо: 12 13
+table_name (36)
+    налево: 15, направо: 13 14
+where_part (37)
+    налево: 16, направо: 4
+select_opt (38)
+    налево: 17 18, направо: 6
+condition (39)
+    налево: 19 20 21, направо: 16 20 21
+predicate (40)
+    налево: 22 23, направо: 19 22
+comparison (41)
+    налево: 24 25 26 27 28 29, направо: 23
 field_value (42)
-    налево: 49, направо: 43 44 45 46 47 48
+    налево: 30, направо: 23
 condition_operator (43)
-    налево: 50 51, направо: 37 41
+    налево: 31 32, направо: 21
 value (44)
-    налево: 52 53 54 55, направо: 49
+    налево: 33 34 35 36, направо: 30
 number_expression (45)
-    налево: 56 57 58, направо: 53 57 58
+    налево: 37 38 39, направо: 34 38 39
 computable_expression (46)
-    налево: 59 60, направо: 56
+    налево: 40 41, направо: 37
 number_operator (47)
-    налево: 61 62 63 64, направо: 58
+    налево: 42 43 44 45, направо: 39
 number (48)
-    налево: 65 66, направо: 59
+    налево: 46 47, направо: 40
 negative_number (49)
-    налево: 67, направо: 65
+    налево: 48, направо: 46
 
 
 состояние 0
 
     0 $accept: . select_list $end
 
-    error   сдвиг, и переход в состояние 1
-    SELECT  сдвиг, и переход в состояние 2
+    SELECT  сдвиг, и переход в состояние 1
 
-    select_list  переход в состояние 3
-    select       переход в состояние 4
-    select_part  переход в состояние 5
+    select_list  переход в состояние 2
+    select       переход в состояние 3
+    select_part  переход в состояние 4
 
 
 состояние 1
 
-    6 select: error . from_part where_part SQL_END
-   11 select_part: error . SELECT select_opt field_list
-   12            | error . select_opt field_list
+    5 select_part: SELECT . field_list
+    6            | SELECT . select_opt field_list
 
-    error     сдвиг, и переход в состояние 6
-    SELECT    сдвиг, и переход в состояние 7
-    FROM      сдвиг, и переход в состояние 8
-    DISTINCT  сдвиг, и переход в состояние 9
-    ALL       сдвиг, и переход в состояние 10
+    IDENTIFICATOR  сдвиг, и переход в состояние 5
+    DISTINCT       сдвиг, и переход в состояние 6
+    ALL            сдвиг, и переход в состояние 7
+    '*'            сдвиг, и переход в состояние 8
 
-    error          [вывод с использованием правила 32 (select_opt)]
-    IDENTIFICATOR  вывод с использованием правила 32 (select_opt)
-    '*'            вывод с использованием правила 32 (select_opt)
-
-    from_part   переход в состояние 11
-    select_opt  переход в состояние 12
+    field_list   переход в состояние 9
+    field_names  переход в состояние 10
+    field_name   переход в состояние 11
+    select_opt   переход в состояние 12
 
 
 состояние 2
 
-   10 select_part: SELECT . select_opt field_list
+    0 $accept: select_list . $end
+    1 select_list: select_list . select
 
-    DISTINCT  сдвиг, и переход в состояние 9
-    ALL       сдвиг, и переход в состояние 10
+    $end    сдвиг, и переход в состояние 13
+    SELECT  сдвиг, и переход в состояние 1
 
-    $default  вывод с использованием правила 32 (select_opt)
-
-    select_opt  переход в состояние 13
+    select       переход в состояние 14
+    select_part  переход в состояние 4
 
 
 состояние 3
 
-    0 $accept: select_list . $end
-    1 select_list: select_list . select
-    3            | select_list . select error
+    2 select_list: select .
 
-    $end    сдвиг, и переход в состояние 14
-    error   сдвиг, и переход в состояние 1
-    SELECT  сдвиг, и переход в состояние 2
-
-    select       переход в состояние 15
-    select_part  переход в состояние 5
+    $default  вывод с использованием правила 2 (select_list)
 
 
 состояние 4
 
-    2 select_list: select .
-    4            | select . error
+    3 select: select_part . from_part SQL_END
+    4       | select_part . from_part where_part SQL_END
 
-    error  сдвиг, и переход в состояние 16
+    FROM  сдвиг, и переход в состояние 15
 
-    $end    вывод с использованием правила 2 (select_list)
-    error   [вывод с использованием правила 2 (select_list)]
-    SELECT  вывод с использованием правила 2 (select_list)
+    from_part  переход в состояние 16
 
 
 состояние 5
 
-    5 select: select_part . from_part where_part SQL_END
-    7       | select_part . error where_part SQL_END
-    8       | select_part . from_part error SQL_END
-    9       | select_part . from_part where_part error
+   11 field_name: IDENTIFICATOR .
 
-    error  сдвиг, и переход в состояние 17
-    FROM   сдвиг, и переход в состояние 8
-
-    from_part  переход в состояние 18
+    $default  вывод с использованием правила 11 (field_name)
 
 
 состояние 6
 
-   22 from_part: error . table_list $@1 FROM error
+   17 select_opt: DISTINCT .
 
-    error          сдвиг, и переход в состояние 19
-    IDENTIFICATOR  сдвиг, и переход в состояние 20
-
-    table_list  переход в состояние 21
-    table_name  переход в состояние 22
+    $default  вывод с использованием правила 17 (select_opt)
 
 
 состояние 7
 
-   11 select_part: error SELECT . select_opt field_list
+   18 select_opt: ALL .
 
-    DISTINCT  сдвиг, и переход в состояние 9
-    ALL       сдвиг, и переход в состояние 10
-
-    $default  вывод с использованием правила 32 (select_opt)
-
-    select_opt  переход в состояние 23
+    $default  вывод с использованием правила 18 (select_opt)
 
 
 состояние 8
 
-   20 from_part: FROM . table_list
+    7 field_list: '*' .
 
-    error          сдвиг, и переход в состояние 19
-    IDENTIFICATOR  сдвиг, и переход в состояние 20
-
-    table_list  переход в состояние 24
-    table_name  переход в состояние 22
+    $default  вывод с использованием правила 7 (field_list)
 
 
 состояние 9
 
-   33 select_opt: DISTINCT .
+    5 select_part: SELECT field_list .
 
-    $default  вывод с использованием правила 33 (select_opt)
+    $default  вывод с использованием правила 5 (select_part)
 
 
 состояние 10
 
-   34 select_opt: ALL .
+    8 field_list: field_names .
+    9 field_names: field_names . COMMA field_name
 
-    $default  вывод с использованием правила 34 (select_opt)
+    COMMA  сдвиг, и переход в состояние 17
+
+    $default  вывод с использованием правила 8 (field_list)
 
 
 состояние 11
 
-    6 select: error from_part . where_part SQL_END
+   10 field_names: field_name .
 
-    error  сдвиг, и переход в состояние 25
-    WHERE  сдвиг, и переход в состояние 26
-
-    SQL_END  вывод с использованием правила 28 (where_part)
-
-    where_part  переход в состояние 27
+    $default  вывод с использованием правила 10 (field_names)
 
 
 состояние 12
 
-   12 select_part: error select_opt . field_list
+    6 select_part: SELECT select_opt . field_list
 
-    error          сдвиг, и переход в состояние 28
-    IDENTIFICATOR  сдвиг, и переход в состояние 29
-    '*'            сдвиг, и переход в состояние 30
+    IDENTIFICATOR  сдвиг, и переход в состояние 5
+    '*'            сдвиг, и переход в состояние 8
 
-    field_list   переход в состояние 31
-    field_names  переход в состояние 32
-    field_name   переход в состояние 33
+    field_list   переход в состояние 18
+    field_names  переход в состояние 10
+    field_name   переход в состояние 11
 
 
 состояние 13
-
-   10 select_part: SELECT select_opt . field_list
-
-    error          сдвиг, и переход в состояние 28
-    IDENTIFICATOR  сдвиг, и переход в состояние 29
-    '*'            сдвиг, и переход в состояние 30
-
-    field_list   переход в состояние 34
-    field_names  переход в состояние 32
-    field_name   переход в состояние 33
-
-
-состояние 14
 
     0 $accept: select_list $end .
 
     $default  accept
 
 
-состояние 15
+состояние 14
 
     1 select_list: select_list select .
-    3            | select_list select . error
 
-    error  сдвиг, и переход в состояние 35
+    $default  вывод с использованием правила 1 (select_list)
 
-    $end    вывод с использованием правила 1 (select_list)
-    error   [вывод с использованием правила 1 (select_list)]
-    SELECT  вывод с использованием правила 1 (select_list)
+
+состояние 15
+
+   12 from_part: FROM . table_list
+
+    IDENTIFICATOR  сдвиг, и переход в состояние 19
+
+    table_list  переход в состояние 20
+    table_name  переход в состояние 21
 
 
 состояние 16
 
-    4 select_list: select error .
+    3 select: select_part from_part . SQL_END
+    4       | select_part from_part . where_part SQL_END
 
-    $default  вывод с использованием правила 4 (select_list)
+    WHERE    сдвиг, и переход в состояние 22
+    SQL_END  сдвиг, и переход в состояние 23
+
+    where_part  переход в состояние 24
 
 
 состояние 17
 
-    7 select: select_part error . where_part SQL_END
-   22 from_part: error . table_list $@1 FROM error
+    9 field_names: field_names COMMA . field_name
 
-    error          сдвиг, и переход в состояние 36
-    IDENTIFICATOR  сдвиг, и переход в состояние 20
-    WHERE          сдвиг, и переход в состояние 26
+    IDENTIFICATOR  сдвиг, и переход в состояние 5
 
-    SQL_END  вывод с использованием правила 28 (where_part)
-
-    table_list  переход в состояние 21
-    table_name  переход в состояние 22
-    where_part  переход в состояние 37
+    field_name  переход в состояние 25
 
 
 состояние 18
 
-    5 select: select_part from_part . where_part SQL_END
-    8       | select_part from_part . error SQL_END
-    9       | select_part from_part . where_part error
+    6 select_part: SELECT select_opt field_list .
 
-    error  сдвиг, и переход в состояние 38
-    WHERE  сдвиг, и переход в состояние 26
-
-    error    [вывод с использованием правила 28 (where_part)]
-    SQL_END  вывод с использованием правила 28 (where_part)
-
-    where_part  переход в состояние 39
+    $default  вывод с использованием правила 6 (select_part)
 
 
 состояние 19
 
-   26 table_list: error .
+   15 table_name: IDENTIFICATOR .
 
-    $default  вывод с использованием правила 26 (table_list)
+    $default  вывод с использованием правила 15 (table_name)
 
 
 состояние 20
 
-   27 table_name: IDENTIFICATOR .
+   12 from_part: FROM table_list .
+   13 table_list: table_list . COMMA table_name
 
-    $default  вывод с использованием правила 27 (table_name)
+    COMMA  сдвиг, и переход в состояние 26
+
+    $default  вывод с использованием правила 12 (from_part)
 
 
 состояние 21
 
-   22 from_part: error table_list . $@1 FROM error
-   23 table_list: table_list . COMMA table_name
-   25           | table_list . error table_name
+   14 table_list: table_name .
 
-    error  сдвиг, и переход в состояние 40
-    COMMA  сдвиг, и переход в состояние 41
-
-    FROM  вывод с использованием правила 21 ($@1)
-
-    $@1  переход в состояние 42
+    $default  вывод с использованием правила 14 (table_list)
 
 
 состояние 22
 
-   24 table_list: table_name .
+   16 where_part: WHERE . condition
 
-    $default  вывод с использованием правила 24 (table_list)
+    IDENTIFICATOR    сдвиг, и переход в состояние 27
+    LB               сдвиг, и переход в состояние 28
+    NOT              сдвиг, и переход в состояние 29
+    NULL_W           сдвиг, и переход в состояние 30
+    DEFAULT          сдвиг, и переход в состояние 31
+    STRING           сдвиг, и переход в состояние 32
+    POSITIVE_NUMBER  сдвиг, и переход в состояние 33
+    '-'              сдвиг, и переход в состояние 34
+
+    condition              переход в состояние 35
+    predicate              переход в состояние 36
+    field_value            переход в состояние 37
+    value                  переход в состояние 38
+    number_expression      переход в состояние 39
+    computable_expression  переход в состояние 40
+    number                 переход в состояние 41
+    negative_number        переход в состояние 42
 
 
 состояние 23
 
-   11 select_part: error SELECT select_opt . field_list
+    3 select: select_part from_part SQL_END .
 
-    error          сдвиг, и переход в состояние 28
-    IDENTIFICATOR  сдвиг, и переход в состояние 29
-    '*'            сдвиг, и переход в состояние 30
-
-    field_list   переход в состояние 43
-    field_names  переход в состояние 32
-    field_name   переход в состояние 33
+    $default  вывод с использованием правила 3 (select)
 
 
 состояние 24
 
-   20 from_part: FROM table_list .
-   23 table_list: table_list . COMMA table_name
-   25           | table_list . error table_name
+    4 select: select_part from_part where_part . SQL_END
 
-    error  сдвиг, и переход в состояние 40
-    COMMA  сдвиг, и переход в состояние 41
-
-    error    [вывод с использованием правила 20 (from_part)]
-    WHERE    вывод с использованием правила 20 (from_part)
-    SQL_END  вывод с использованием правила 20 (from_part)
+    SQL_END  сдвиг, и переход в состояние 43
 
 
 состояние 25
 
-   30 where_part: error . condition
+    9 field_names: field_names COMMA field_name .
 
-    error            сдвиг, и переход в состояние 44
-    IDENTIFICATOR    сдвиг, и переход в состояние 45
-    LB               сдвиг, и переход в состояние 46
-    NOT              сдвиг, и переход в состояние 47
-    NULL_W           сдвиг, и переход в состояние 48
-    DEFAULT          сдвиг, и переход в состояние 49
-    STRING           сдвиг, и переход в состояние 50
-    POSITIVE_NUMBER  сдвиг, и переход в состояние 51
-    '-'              сдвиг, и переход в состояние 52
-
-    condition              переход в состояние 53
-    predicate              переход в состояние 54
-    field_value            переход в состояние 55
-    value                  переход в состояние 56
-    number_expression      переход в состояние 57
-    computable_expression  переход в состояние 58
-    number                 переход в состояние 59
-    negative_number        переход в состояние 60
+    $default  вывод с использованием правила 9 (field_names)
 
 
 состояние 26
 
-   29 where_part: WHERE . condition
-   31           | WHERE . error
+   13 table_list: table_list COMMA . table_name
 
-    error            сдвиг, и переход в состояние 61
-    IDENTIFICATOR    сдвиг, и переход в состояние 45
-    LB               сдвиг, и переход в состояние 46
-    NOT              сдвиг, и переход в состояние 47
-    NULL_W           сдвиг, и переход в состояние 48
-    DEFAULT          сдвиг, и переход в состояние 49
-    STRING           сдвиг, и переход в состояние 50
-    POSITIVE_NUMBER  сдвиг, и переход в состояние 51
-    '-'              сдвиг, и переход в состояние 52
+    IDENTIFICATOR  сдвиг, и переход в состояние 19
 
-    condition              переход в состояние 62
-    predicate              переход в состояние 54
-    field_value            переход в состояние 55
-    value                  переход в состояние 56
-    number_expression      переход в состояние 57
-    computable_expression  переход в состояние 58
-    number                 переход в состояние 59
-    negative_number        переход в состояние 60
+    table_name  переход в состояние 44
 
 
 состояние 27
 
-    6 select: error from_part where_part . SQL_END
+   41 computable_expression: IDENTIFICATOR .
 
-    SQL_END  сдвиг, и переход в состояние 63
+    $default  вывод с использованием правила 41 (computable_expression)
 
 
 состояние 28
 
-   18 field_names: error .
+   20 condition: LB . condition RB
+   38 number_expression: LB . number_expression RB
 
-    $default  вывод с использованием правила 18 (field_names)
+    IDENTIFICATOR    сдвиг, и переход в состояние 27
+    LB               сдвиг, и переход в состояние 28
+    NOT              сдвиг, и переход в состояние 29
+    NULL_W           сдвиг, и переход в состояние 30
+    DEFAULT          сдвиг, и переход в состояние 31
+    STRING           сдвиг, и переход в состояние 32
+    POSITIVE_NUMBER  сдвиг, и переход в состояние 33
+    '-'              сдвиг, и переход в состояние 34
+
+    condition              переход в состояние 45
+    predicate              переход в состояние 36
+    field_value            переход в состояние 37
+    value                  переход в состояние 38
+    number_expression      переход в состояние 46
+    computable_expression  переход в состояние 40
+    number                 переход в состояние 41
+    negative_number        переход в состояние 42
 
 
 состояние 29
 
-   19 field_name: IDENTIFICATOR .
+   22 predicate: NOT . predicate
 
-    $default  вывод с использованием правила 19 (field_name)
+    IDENTIFICATOR    сдвиг, и переход в состояние 27
+    LB               сдвиг, и переход в состояние 47
+    NOT              сдвиг, и переход в состояние 29
+    NULL_W           сдвиг, и переход в состояние 30
+    DEFAULT          сдвиг, и переход в состояние 31
+    STRING           сдвиг, и переход в состояние 32
+    POSITIVE_NUMBER  сдвиг, и переход в состояние 33
+    '-'              сдвиг, и переход в состояние 34
+
+    predicate              переход в состояние 48
+    field_value            переход в состояние 37
+    value                  переход в состояние 38
+    number_expression      переход в состояние 39
+    computable_expression  переход в состояние 40
+    number                 переход в состояние 41
+    negative_number        переход в состояние 42
 
 
 состояние 30
 
-   13 field_list: '*' .
+   35 value: NULL_W .
 
-    $default  вывод с использованием правила 13 (field_list)
+    $default  вывод с использованием правила 35 (value)
 
 
 состояние 31
 
-   12 select_part: error select_opt field_list .
+   36 value: DEFAULT .
 
-    $default  вывод с использованием правила 12 (select_part)
+    $default  вывод с использованием правила 36 (value)
 
 
 состояние 32
 
-   14 field_list: field_names .
-   15 field_names: field_names . COMMA field_name
-   17            | field_names . error field_name
+   33 value: STRING .
 
-    error  сдвиг, и переход в состояние 64
-    COMMA  сдвиг, и переход в состояние 65
-
-    error  [вывод с использованием правила 14 (field_list)]
-    FROM   вывод с использованием правила 14 (field_list)
+    $default  вывод с использованием правила 33 (value)
 
 
 состояние 33
 
-   16 field_names: field_name .
+   47 number: POSITIVE_NUMBER .
 
-    $default  вывод с использованием правила 16 (field_names)
+    $default  вывод с использованием правила 47 (number)
 
 
 состояние 34
 
-   10 select_part: SELECT select_opt field_list .
+   48 negative_number: '-' . POSITIVE_NUMBER
 
-    $default  вывод с использованием правила 10 (select_part)
+    POSITIVE_NUMBER  сдвиг, и переход в состояние 49
 
 
 состояние 35
 
-    3 select_list: select_list select error .
+   16 where_part: WHERE condition .
+   21 condition: condition . condition_operator condition
 
-    $default  вывод с использованием правила 3 (select_list)
+    AND  сдвиг, и переход в состояние 50
+    OR   сдвиг, и переход в состояние 51
+
+    $default  вывод с использованием правила 16 (where_part)
+
+    condition_operator  переход в состояние 52
 
 
 состояние 36
 
-   26 table_list: error .
-   30 where_part: error . condition
+   19 condition: predicate .
 
-    error            сдвиг, и переход в состояние 44
-    IDENTIFICATOR    сдвиг, и переход в состояние 45
-    LB               сдвиг, и переход в состояние 46
-    NOT              сдвиг, и переход в состояние 47
-    NULL_W           сдвиг, и переход в состояние 48
-    DEFAULT          сдвиг, и переход в состояние 49
-    STRING           сдвиг, и переход в состояние 50
-    POSITIVE_NUMBER  сдвиг, и переход в состояние 51
-    '-'              сдвиг, и переход в состояние 52
-
-    error  [вывод с использованием правила 26 (table_list)]
-    FROM   вывод с использованием правила 26 (table_list)
-    COMMA  вывод с использованием правила 26 (table_list)
-
-    condition              переход в состояние 53
-    predicate              переход в состояние 54
-    field_value            переход в состояние 55
-    value                  переход в состояние 56
-    number_expression      переход в состояние 57
-    computable_expression  переход в состояние 58
-    number                 переход в состояние 59
-    negative_number        переход в состояние 60
+    $default  вывод с использованием правила 19 (condition)
 
 
 состояние 37
 
-    7 select: select_part error where_part . SQL_END
+   23 predicate: field_value . comparison field_value
 
-    SQL_END  сдвиг, и переход в состояние 66
+    '='  сдвиг, и переход в состояние 53
+    '<'  сдвиг, и переход в состояние 54
+    '>'  сдвиг, и переход в состояние 55
+
+    comparison  переход в состояние 56
 
 
 состояние 38
 
-    8 select: select_part from_part error . SQL_END
-   30 where_part: error . condition
+   30 field_value: value .
 
-    error            сдвиг, и переход в состояние 44
-    IDENTIFICATOR    сдвиг, и переход в состояние 45
-    LB               сдвиг, и переход в состояние 46
-    NOT              сдвиг, и переход в состояние 47
-    NULL_W           сдвиг, и переход в состояние 48
-    DEFAULT          сдвиг, и переход в состояние 49
-    STRING           сдвиг, и переход в состояние 50
-    POSITIVE_NUMBER  сдвиг, и переход в состояние 51
-    SQL_END          сдвиг, и переход в состояние 67
-    '-'              сдвиг, и переход в состояние 52
-
-    condition              переход в состояние 53
-    predicate              переход в состояние 54
-    field_value            переход в состояние 55
-    value                  переход в состояние 56
-    number_expression      переход в состояние 57
-    computable_expression  переход в состояние 58
-    number                 переход в состояние 59
-    negative_number        переход в состояние 60
+    $default  вывод с использованием правила 30 (field_value)
 
 
 состояние 39
 
-    5 select: select_part from_part where_part . SQL_END
-    9       | select_part from_part where_part . error
+   34 value: number_expression .
+   39 number_expression: number_expression . number_operator number_expression
 
-    error    сдвиг, и переход в состояние 68
-    SQL_END  сдвиг, и переход в состояние 69
+    '*'  сдвиг, и переход в состояние 57
+    '+'  сдвиг, и переход в состояние 58
+    '-'  сдвиг, и переход в состояние 59
+    '/'  сдвиг, и переход в состояние 60
+
+    $default  вывод с использованием правила 34 (value)
+
+    number_operator  переход в состояние 61
 
 
 состояние 40
 
-   25 table_list: table_list error . table_name
+   37 number_expression: computable_expression .
 
-    IDENTIFICATOR  сдвиг, и переход в состояние 20
-
-    table_name  переход в состояние 70
+    $default  вывод с использованием правила 37 (number_expression)
 
 
 состояние 41
 
-   23 table_list: table_list COMMA . table_name
+   40 computable_expression: number .
 
-    IDENTIFICATOR  сдвиг, и переход в состояние 20
-
-    table_name  переход в состояние 71
+    $default  вывод с использованием правила 40 (computable_expression)
 
 
 состояние 42
 
-   22 from_part: error table_list $@1 . FROM error
+   46 number: negative_number .
 
-    FROM  сдвиг, и переход в состояние 72
+    $default  вывод с использованием правила 46 (number)
 
 
 состояние 43
 
-   11 select_part: error SELECT select_opt field_list .
+    4 select: select_part from_part where_part SQL_END .
 
-    $default  вывод с использованием правила 11 (select_part)
+    $default  вывод с использованием правила 4 (select)
 
 
 состояние 44
 
-   38 condition: error . condition RB
-   41          | error . condition_operator condition
+   13 table_list: table_list COMMA table_name .
 
-    error            сдвиг, и переход в состояние 44
-    IDENTIFICATOR    сдвиг, и переход в состояние 45
-    LB               сдвиг, и переход в состояние 46
-    NOT              сдвиг, и переход в состояние 47
-    AND              сдвиг, и переход в состояние 73
-    OR               сдвиг, и переход в состояние 74
-    NULL_W           сдвиг, и переход в состояние 48
-    DEFAULT          сдвиг, и переход в состояние 49
-    STRING           сдвиг, и переход в состояние 50
-    POSITIVE_NUMBER  сдвиг, и переход в состояние 51
-    '-'              сдвиг, и переход в состояние 52
-
-    condition              переход в состояние 75
-    predicate              переход в состояние 54
-    field_value            переход в состояние 55
-    condition_operator     переход в состояние 76
-    value                  переход в состояние 56
-    number_expression      переход в состояние 57
-    computable_expression  переход в состояние 58
-    number                 переход в состояние 59
-    negative_number        переход в состояние 60
+    $default  вывод с использованием правила 13 (table_list)
 
 
 состояние 45
 
-   60 computable_expression: IDENTIFICATOR .
+   20 condition: LB condition . RB
+   21          | condition . condition_operator condition
 
-    $default  вывод с использованием правила 60 (computable_expression)
+    RB   сдвиг, и переход в состояние 62
+    AND  сдвиг, и переход в состояние 50
+    OR   сдвиг, и переход в состояние 51
+
+    condition_operator  переход в состояние 52
 
 
 состояние 46
 
-   36 condition: LB . condition RB
-   39          | LB . error RB
-   40          | LB . condition error
-   57 number_expression: LB . number_expression RB
+   34 value: number_expression .
+   38 number_expression: LB number_expression . RB
+   39                  | number_expression . number_operator number_expression
 
-    error            сдвиг, и переход в состояние 77
-    IDENTIFICATOR    сдвиг, и переход в состояние 45
-    LB               сдвиг, и переход в состояние 46
-    NOT              сдвиг, и переход в состояние 47
-    NULL_W           сдвиг, и переход в состояние 48
-    DEFAULT          сдвиг, и переход в состояние 49
-    STRING           сдвиг, и переход в состояние 50
-    POSITIVE_NUMBER  сдвиг, и переход в состояние 51
-    '-'              сдвиг, и переход в состояние 52
+    RB   сдвиг, и переход в состояние 63
+    '*'  сдвиг, и переход в состояние 57
+    '+'  сдвиг, и переход в состояние 58
+    '-'  сдвиг, и переход в состояние 59
+    '/'  сдвиг, и переход в состояние 60
 
-    condition              переход в состояние 78
-    predicate              переход в состояние 54
-    field_value            переход в состояние 55
-    value                  переход в состояние 56
-    number_expression      переход в состояние 79
-    computable_expression  переход в состояние 58
-    number                 переход в состояние 59
-    negative_number        переход в состояние 60
+    $default  вывод с использованием правила 34 (value)
+
+    number_operator  переход в состояние 61
 
 
 состояние 47
 
-   42 predicate: NOT . predicate
+   38 number_expression: LB . number_expression RB
 
-    IDENTIFICATOR    сдвиг, и переход в состояние 45
-    LB               сдвиг, и переход в состояние 80
-    NOT              сдвиг, и переход в состояние 47
-    NULL_W           сдвиг, и переход в состояние 48
-    DEFAULT          сдвиг, и переход в состояние 49
-    STRING           сдвиг, и переход в состояние 50
-    POSITIVE_NUMBER  сдвиг, и переход в состояние 51
-    '-'              сдвиг, и переход в состояние 52
+    IDENTIFICATOR    сдвиг, и переход в состояние 27
+    LB               сдвиг, и переход в состояние 47
+    POSITIVE_NUMBER  сдвиг, и переход в состояние 33
+    '-'              сдвиг, и переход в состояние 34
 
-    predicate              переход в состояние 81
-    field_value            переход в состояние 55
-    value                  переход в состояние 56
-    number_expression      переход в состояние 57
-    computable_expression  переход в состояние 58
-    number                 переход в состояние 59
-    negative_number        переход в состояние 60
+    number_expression      переход в состояние 64
+    computable_expression  переход в состояние 40
+    number                 переход в состояние 41
+    negative_number        переход в состояние 42
 
 
 состояние 48
 
-   54 value: NULL_W .
+   22 predicate: NOT predicate .
 
-    $default  вывод с использованием правила 54 (value)
+    $default  вывод с использованием правила 22 (predicate)
 
 
 состояние 49
 
-   55 value: DEFAULT .
+   48 negative_number: '-' POSITIVE_NUMBER .
 
-    $default  вывод с использованием правила 55 (value)
+    $default  вывод с использованием правила 48 (negative_number)
 
 
 состояние 50
 
-   52 value: STRING .
+   31 condition_operator: AND .
 
-    $default  вывод с использованием правила 52 (value)
+    $default  вывод с использованием правила 31 (condition_operator)
 
 
 состояние 51
 
-   66 number: POSITIVE_NUMBER .
+   32 condition_operator: OR .
 
-    $default  вывод с использованием правила 66 (number)
+    $default  вывод с использованием правила 32 (condition_operator)
 
 
 состояние 52
 
-   67 negative_number: '-' . POSITIVE_NUMBER
+   21 condition: condition condition_operator . condition
 
-    POSITIVE_NUMBER  сдвиг, и переход в состояние 82
+    IDENTIFICATOR    сдвиг, и переход в состояние 27
+    LB               сдвиг, и переход в состояние 28
+    NOT              сдвиг, и переход в состояние 29
+    NULL_W           сдвиг, и переход в состояние 30
+    DEFAULT          сдвиг, и переход в состояние 31
+    STRING           сдвиг, и переход в состояние 32
+    POSITIVE_NUMBER  сдвиг, и переход в состояние 33
+    '-'              сдвиг, и переход в состояние 34
+
+    condition              переход в состояние 65
+    predicate              переход в состояние 36
+    field_value            переход в состояние 37
+    value                  переход в состояние 38
+    number_expression      переход в состояние 39
+    computable_expression  переход в состояние 40
+    number                 переход в состояние 41
+    negative_number        переход в состояние 42
 
 
 состояние 53
 
-   30 where_part: error condition .
-   37 condition: condition . condition_operator condition
+   24 comparison: '=' .
 
-    AND  сдвиг, и переход в состояние 73
-    OR   сдвиг, и переход в состояние 74
-
-    $default  вывод с использованием правила 30 (where_part)
-
-    condition_operator  переход в состояние 83
+    $default  вывод с использованием правила 24 (comparison)
 
 
 состояние 54
 
-   35 condition: predicate .
+   25 comparison: '<' . '>'
+   26           | '<' . '='
+   27           | '<' .
 
-    $default  вывод с использованием правила 35 (condition)
+    '='  сдвиг, и переход в состояние 66
+    '>'  сдвиг, и переход в состояние 67
+
+    $default  вывод с использованием правила 27 (comparison)
 
 
 состояние 55
 
-   43 predicate: field_value . '=' field_value
-   44          | field_value . '<' '>' field_value
-   45          | field_value . '<' '=' field_value
-   46          | field_value . '<' field_value
-   47          | field_value . '>' '=' field_value
-   48          | field_value . '>' field_value
+   28 comparison: '>' . '='
+   29           | '>' .
 
-    '='  сдвиг, и переход в состояние 84
-    '<'  сдвиг, и переход в состояние 85
-    '>'  сдвиг, и переход в состояние 86
+    '='  сдвиг, и переход в состояние 68
+
+    $default  вывод с использованием правила 29 (comparison)
 
 
 состояние 56
 
-   49 field_value: value .
+   23 predicate: field_value comparison . field_value
 
-    $default  вывод с использованием правила 49 (field_value)
+    IDENTIFICATOR    сдвиг, и переход в состояние 27
+    LB               сдвиг, и переход в состояние 47
+    NULL_W           сдвиг, и переход в состояние 30
+    DEFAULT          сдвиг, и переход в состояние 31
+    STRING           сдвиг, и переход в состояние 32
+    POSITIVE_NUMBER  сдвиг, и переход в состояние 33
+    '-'              сдвиг, и переход в состояние 34
+
+    field_value            переход в состояние 69
+    value                  переход в состояние 38
+    number_expression      переход в состояние 39
+    computable_expression  переход в состояние 40
+    number                 переход в состояние 41
+    negative_number        переход в состояние 42
 
 
 состояние 57
 
-   53 value: number_expression .
-   58 number_expression: number_expression . number_operator number_expression
+   44 number_operator: '*' .
 
-    '*'  сдвиг, и переход в состояние 87
-    '+'  сдвиг, и переход в состояние 88
-    '-'  сдвиг, и переход в состояние 89
-    '/'  сдвиг, и переход в состояние 90
-
-    $default  вывод с использованием правила 53 (value)
-
-    number_operator  переход в состояние 91
+    $default  вывод с использованием правила 44 (number_operator)
 
 
 состояние 58
 
-   56 number_expression: computable_expression .
+   42 number_operator: '+' .
 
-    $default  вывод с использованием правила 56 (number_expression)
+    $default  вывод с использованием правила 42 (number_operator)
 
 
 состояние 59
 
-   59 computable_expression: number .
+   43 number_operator: '-' .
 
-    $default  вывод с использованием правила 59 (computable_expression)
+    $default  вывод с использованием правила 43 (number_operator)
 
 
 состояние 60
 
-   65 number: negative_number .
+   45 number_operator: '/' .
 
-    $default  вывод с использованием правила 65 (number)
+    $default  вывод с использованием правила 45 (number_operator)
 
 
 состояние 61
 
-   31 where_part: WHERE error .
-   38 condition: error . condition RB
-   41          | error . condition_operator condition
+   39 number_expression: number_expression number_operator . number_expression
 
-    error            сдвиг, и переход в состояние 44
-    IDENTIFICATOR    сдвиг, и переход в состояние 45
-    LB               сдвиг, и переход в состояние 46
-    NOT              сдвиг, и переход в состояние 47
-    AND              сдвиг, и переход в состояние 73
-    OR               сдвиг, и переход в состояние 74
-    NULL_W           сдвиг, и переход в состояние 48
-    DEFAULT          сдвиг, и переход в состояние 49
-    STRING           сдвиг, и переход в состояние 50
-    POSITIVE_NUMBER  сдвиг, и переход в состояние 51
-    '-'              сдвиг, и переход в состояние 52
+    IDENTIFICATOR    сдвиг, и переход в состояние 27
+    LB               сдвиг, и переход в состояние 47
+    POSITIVE_NUMBER  сдвиг, и переход в состояние 33
+    '-'              сдвиг, и переход в состояние 34
 
-    error    [вывод с использованием правила 31 (where_part)]
-    SQL_END  вывод с использованием правила 31 (where_part)
-
-    condition              переход в состояние 75
-    predicate              переход в состояние 54
-    field_value            переход в состояние 55
-    condition_operator     переход в состояние 76
-    value                  переход в состояние 56
-    number_expression      переход в состояние 57
-    computable_expression  переход в состояние 58
-    number                 переход в состояние 59
-    negative_number        переход в состояние 60
+    number_expression      переход в состояние 70
+    computable_expression  переход в состояние 40
+    number                 переход в состояние 41
+    negative_number        переход в состояние 42
 
 
 состояние 62
 
-   29 where_part: WHERE condition .
-   37 condition: condition . condition_operator condition
+   20 condition: LB condition RB .
 
-    AND  сдвиг, и переход в состояние 73
-    OR   сдвиг, и переход в состояние 74
-
-    $default  вывод с использованием правила 29 (where_part)
-
-    condition_operator  переход в состояние 83
+    $default  вывод с использованием правила 20 (condition)
 
 
 состояние 63
 
-    6 select: error from_part where_part SQL_END .
+   38 number_expression: LB number_expression RB .
 
-    $default  вывод с использованием правила 6 (select)
+    $default  вывод с использованием правила 38 (number_expression)
 
 
 состояние 64
 
-   17 field_names: field_names error . field_name
+   38 number_expression: LB number_expression . RB
+   39                  | number_expression . number_operator number_expression
 
-    IDENTIFICATOR  сдвиг, и переход в состояние 29
+    RB   сдвиг, и переход в состояние 63
+    '*'  сдвиг, и переход в состояние 57
+    '+'  сдвиг, и переход в состояние 58
+    '-'  сдвиг, и переход в состояние 59
+    '/'  сдвиг, и переход в состояние 60
 
-    field_name  переход в состояние 92
+    number_operator  переход в состояние 61
 
 
 состояние 65
 
-   15 field_names: field_names COMMA . field_name
+   21 condition: condition . condition_operator condition
+   21          | condition condition_operator condition .
 
-    IDENTIFICATOR  сдвиг, и переход в состояние 29
+    AND  сдвиг, и переход в состояние 50
+    OR   сдвиг, и переход в состояние 51
 
-    field_name  переход в состояние 93
+    AND       [вывод с использованием правила 21 (condition)]
+    OR        [вывод с использованием правила 21 (condition)]
+    $default  вывод с использованием правила 21 (condition)
+
+    condition_operator  переход в состояние 52
 
 
 состояние 66
 
-    7 select: select_part error where_part SQL_END .
+   26 comparison: '<' '=' .
 
-    $default  вывод с использованием правила 7 (select)
+    $default  вывод с использованием правила 26 (comparison)
 
 
 состояние 67
 
-    8 select: select_part from_part error SQL_END .
+   25 comparison: '<' '>' .
 
-    $default  вывод с использованием правила 8 (select)
+    $default  вывод с использованием правила 25 (comparison)
 
 
 состояние 68
 
-    9 select: select_part from_part where_part error .
+   28 comparison: '>' '=' .
 
-    $default  вывод с использованием правила 9 (select)
+    $default  вывод с использованием правила 28 (comparison)
 
 
 состояние 69
 
-    5 select: select_part from_part where_part SQL_END .
+   23 predicate: field_value comparison field_value .
 
-    $default  вывод с использованием правила 5 (select)
+    $default  вывод с использованием правила 23 (predicate)
 
 
 состояние 70
 
-   25 table_list: table_list error table_name .
-
-    $default  вывод с использованием правила 25 (table_list)
-
-
-состояние 71
-
-   23 table_list: table_list COMMA table_name .
-
-    $default  вывод с использованием правила 23 (table_list)
-
-
-состояние 72
-
-   22 from_part: error table_list $@1 FROM . error
-
-    error  сдвиг, и переход в состояние 94
-
-
-состояние 73
-
-   50 condition_operator: AND .
-
-    $default  вывод с использованием правила 50 (condition_operator)
-
-
-состояние 74
-
-   51 condition_operator: OR .
-
-    $default  вывод с использованием правила 51 (condition_operator)
-
-
-состояние 75
-
-   37 condition: condition . condition_operator condition
-   38          | error condition . RB
-
-    RB   сдвиг, и переход в состояние 95
-    AND  сдвиг, и переход в состояние 73
-    OR   сдвиг, и переход в состояние 74
-
-    condition_operator  переход в состояние 83
-
-
-состояние 76
-
-   41 condition: error condition_operator . condition
-
-    error            сдвиг, и переход в состояние 44
-    IDENTIFICATOR    сдвиг, и переход в состояние 45
-    LB               сдвиг, и переход в состояние 46
-    NOT              сдвиг, и переход в состояние 47
-    NULL_W           сдвиг, и переход в состояние 48
-    DEFAULT          сдвиг, и переход в состояние 49
-    STRING           сдвиг, и переход в состояние 50
-    POSITIVE_NUMBER  сдвиг, и переход в состояние 51
-    '-'              сдвиг, и переход в состояние 52
-
-    condition              переход в состояние 96
-    predicate              переход в состояние 54
-    field_value            переход в состояние 55
-    value                  переход в состояние 56
-    number_expression      переход в состояние 57
-    computable_expression  переход в состояние 58
-    number                 переход в состояние 59
-    negative_number        переход в состояние 60
-
-
-состояние 77
-
-   38 condition: error . condition RB
-   39          | LB error . RB
-   41          | error . condition_operator condition
-
-    error            сдвиг, и переход в состояние 44
-    IDENTIFICATOR    сдвиг, и переход в состояние 45
-    LB               сдвиг, и переход в состояние 46
-    RB               сдвиг, и переход в состояние 97
-    NOT              сдвиг, и переход в состояние 47
-    AND              сдвиг, и переход в состояние 73
-    OR               сдвиг, и переход в состояние 74
-    NULL_W           сдвиг, и переход в состояние 48
-    DEFAULT          сдвиг, и переход в состояние 49
-    STRING           сдвиг, и переход в состояние 50
-    POSITIVE_NUMBER  сдвиг, и переход в состояние 51
-    '-'              сдвиг, и переход в состояние 52
-
-    condition              переход в состояние 75
-    predicate              переход в состояние 54
-    field_value            переход в состояние 55
-    condition_operator     переход в состояние 76
-    value                  переход в состояние 56
-    number_expression      переход в состояние 57
-    computable_expression  переход в состояние 58
-    number                 переход в состояние 59
-    negative_number        переход в состояние 60
-
-
-состояние 78
-
-   36 condition: LB condition . RB
-   37          | condition . condition_operator condition
-   40          | LB condition . error
-
-    error  сдвиг, и переход в состояние 98
-    RB     сдвиг, и переход в состояние 99
-    AND    сдвиг, и переход в состояние 73
-    OR     сдвиг, и переход в состояние 74
-
-    condition_operator  переход в состояние 83
-
-
-состояние 79
-
-   53 value: number_expression .
-   57 number_expression: LB number_expression . RB
-   58                  | number_expression . number_operator number_expression
-
-    RB   сдвиг, и переход в состояние 100
-    '*'  сдвиг, и переход в состояние 87
-    '+'  сдвиг, и переход в состояние 88
-    '-'  сдвиг, и переход в состояние 89
-    '/'  сдвиг, и переход в состояние 90
-
-    $default  вывод с использованием правила 53 (value)
-
-    number_operator  переход в состояние 91
-
-
-состояние 80
-
-   57 number_expression: LB . number_expression RB
-
-    IDENTIFICATOR    сдвиг, и переход в состояние 45
-    LB               сдвиг, и переход в состояние 80
-    POSITIVE_NUMBER  сдвиг, и переход в состояние 51
-    '-'              сдвиг, и переход в состояние 52
-
-    number_expression      переход в состояние 101
-    computable_expression  переход в состояние 58
-    number                 переход в состояние 59
-    negative_number        переход в состояние 60
-
-
-состояние 81
-
-   42 predicate: NOT predicate .
-
-    $default  вывод с использованием правила 42 (predicate)
-
-
-состояние 82
-
-   67 negative_number: '-' POSITIVE_NUMBER .
-
-    $default  вывод с использованием правила 67 (negative_number)
-
-
-состояние 83
-
-   37 condition: condition condition_operator . condition
-
-    error            сдвиг, и переход в состояние 44
-    IDENTIFICATOR    сдвиг, и переход в состояние 45
-    LB               сдвиг, и переход в состояние 46
-    NOT              сдвиг, и переход в состояние 47
-    NULL_W           сдвиг, и переход в состояние 48
-    DEFAULT          сдвиг, и переход в состояние 49
-    STRING           сдвиг, и переход в состояние 50
-    POSITIVE_NUMBER  сдвиг, и переход в состояние 51
-    '-'              сдвиг, и переход в состояние 52
-
-    condition              переход в состояние 102
-    predicate              переход в состояние 54
-    field_value            переход в состояние 55
-    value                  переход в состояние 56
-    number_expression      переход в состояние 57
-    computable_expression  переход в состояние 58
-    number                 переход в состояние 59
-    negative_number        переход в состояние 60
-
-
-состояние 84
-
-   43 predicate: field_value '=' . field_value
-
-    IDENTIFICATOR    сдвиг, и переход в состояние 45
-    LB               сдвиг, и переход в состояние 80
-    NULL_W           сдвиг, и переход в состояние 48
-    DEFAULT          сдвиг, и переход в состояние 49
-    STRING           сдвиг, и переход в состояние 50
-    POSITIVE_NUMBER  сдвиг, и переход в состояние 51
-    '-'              сдвиг, и переход в состояние 52
-
-    field_value            переход в состояние 103
-    value                  переход в состояние 56
-    number_expression      переход в состояние 57
-    computable_expression  переход в состояние 58
-    number                 переход в состояние 59
-    negative_number        переход в состояние 60
-
-
-состояние 85
-
-   44 predicate: field_value '<' . '>' field_value
-   45          | field_value '<' . '=' field_value
-   46          | field_value '<' . field_value
-
-    IDENTIFICATOR    сдвиг, и переход в состояние 45
-    LB               сдвиг, и переход в состояние 80
-    NULL_W           сдвиг, и переход в состояние 48
-    DEFAULT          сдвиг, и переход в состояние 49
-    STRING           сдвиг, и переход в состояние 50
-    POSITIVE_NUMBER  сдвиг, и переход в состояние 51
-    '='              сдвиг, и переход в состояние 104
-    '>'              сдвиг, и переход в состояние 105
-    '-'              сдвиг, и переход в состояние 52
-
-    field_value            переход в состояние 106
-    value                  переход в состояние 56
-    number_expression      переход в состояние 57
-    computable_expression  переход в состояние 58
-    number                 переход в состояние 59
-    negative_number        переход в состояние 60
-
-
-состояние 86
-
-   47 predicate: field_value '>' . '=' field_value
-   48          | field_value '>' . field_value
-
-    IDENTIFICATOR    сдвиг, и переход в состояние 45
-    LB               сдвиг, и переход в состояние 80
-    NULL_W           сдвиг, и переход в состояние 48
-    DEFAULT          сдвиг, и переход в состояние 49
-    STRING           сдвиг, и переход в состояние 50
-    POSITIVE_NUMBER  сдвиг, и переход в состояние 51
-    '='              сдвиг, и переход в состояние 107
-    '-'              сдвиг, и переход в состояние 52
-
-    field_value            переход в состояние 108
-    value                  переход в состояние 56
-    number_expression      переход в состояние 57
-    computable_expression  переход в состояние 58
-    number                 переход в состояние 59
-    negative_number        переход в состояние 60
-
-
-состояние 87
-
-   63 number_operator: '*' .
-
-    $default  вывод с использованием правила 63 (number_operator)
-
-
-состояние 88
-
-   61 number_operator: '+' .
-
-    $default  вывод с использованием правила 61 (number_operator)
-
-
-состояние 89
-
-   62 number_operator: '-' .
-
-    $default  вывод с использованием правила 62 (number_operator)
-
-
-состояние 90
-
-   64 number_operator: '/' .
-
-    $default  вывод с использованием правила 64 (number_operator)
-
-
-состояние 91
-
-   58 number_expression: number_expression number_operator . number_expression
-
-    IDENTIFICATOR    сдвиг, и переход в состояние 45
-    LB               сдвиг, и переход в состояние 80
-    POSITIVE_NUMBER  сдвиг, и переход в состояние 51
-    '-'              сдвиг, и переход в состояние 52
-
-    number_expression      переход в состояние 109
-    computable_expression  переход в состояние 58
-    number                 переход в состояние 59
-    negative_number        переход в состояние 60
-
-
-состояние 92
-
-   17 field_names: field_names error field_name .
-
-    $default  вывод с использованием правила 17 (field_names)
-
-
-состояние 93
-
-   15 field_names: field_names COMMA field_name .
-
-    $default  вывод с использованием правила 15 (field_names)
-
-
-состояние 94
-
-   22 from_part: error table_list $@1 FROM error .
-
-    $default  вывод с использованием правила 22 (from_part)
-
-
-состояние 95
-
-   38 condition: error condition RB .
-
-    $default  вывод с использованием правила 38 (condition)
-
-
-состояние 96
-
-   37 condition: condition . condition_operator condition
-   41          | error condition_operator condition .
-
-    AND  сдвиг, и переход в состояние 73
-    OR   сдвиг, и переход в состояние 74
-
-    AND       [вывод с использованием правила 41 (condition)]
-    OR        [вывод с использованием правила 41 (condition)]
-    $default  вывод с использованием правила 41 (condition)
-
-    condition_operator  переход в состояние 83
-
-
-состояние 97
-
-   39 condition: LB error RB .
-
-    $default  вывод с использованием правила 39 (condition)
-
-
-состояние 98
-
-   40 condition: LB condition error .
-
-    $default  вывод с использованием правила 40 (condition)
-
-
-состояние 99
-
-   36 condition: LB condition RB .
-
-    $default  вывод с использованием правила 36 (condition)
-
-
-состояние 100
-
-   57 number_expression: LB number_expression RB .
-
-    $default  вывод с использованием правила 57 (number_expression)
-
-
-состояние 101
-
-   57 number_expression: LB number_expression . RB
-   58                  | number_expression . number_operator number_expression
-
-    RB   сдвиг, и переход в состояние 100
-    '*'  сдвиг, и переход в состояние 87
-    '+'  сдвиг, и переход в состояние 88
-    '-'  сдвиг, и переход в состояние 89
-    '/'  сдвиг, и переход в состояние 90
-
-    number_operator  переход в состояние 91
-
-
-состояние 102
-
-   37 condition: condition . condition_operator condition
-   37          | condition condition_operator condition .
-
-    AND  сдвиг, и переход в состояние 73
-    OR   сдвиг, и переход в состояние 74
-
-    AND       [вывод с использованием правила 37 (condition)]
-    OR        [вывод с использованием правила 37 (condition)]
-    $default  вывод с использованием правила 37 (condition)
-
-    condition_operator  переход в состояние 83
-
-
-состояние 103
-
-   43 predicate: field_value '=' field_value .
-
-    $default  вывод с использованием правила 43 (predicate)
-
-
-состояние 104
-
-   45 predicate: field_value '<' '=' . field_value
-
-    IDENTIFICATOR    сдвиг, и переход в состояние 45
-    LB               сдвиг, и переход в состояние 80
-    NULL_W           сдвиг, и переход в состояние 48
-    DEFAULT          сдвиг, и переход в состояние 49
-    STRING           сдвиг, и переход в состояние 50
-    POSITIVE_NUMBER  сдвиг, и переход в состояние 51
-    '-'              сдвиг, и переход в состояние 52
-
-    field_value            переход в состояние 110
-    value                  переход в состояние 56
-    number_expression      переход в состояние 57
-    computable_expression  переход в состояние 58
-    number                 переход в состояние 59
-    negative_number        переход в состояние 60
-
-
-состояние 105
-
-   44 predicate: field_value '<' '>' . field_value
-
-    IDENTIFICATOR    сдвиг, и переход в состояние 45
-    LB               сдвиг, и переход в состояние 80
-    NULL_W           сдвиг, и переход в состояние 48
-    DEFAULT          сдвиг, и переход в состояние 49
-    STRING           сдвиг, и переход в состояние 50
-    POSITIVE_NUMBER  сдвиг, и переход в состояние 51
-    '-'              сдвиг, и переход в состояние 52
-
-    field_value            переход в состояние 111
-    value                  переход в состояние 56
-    number_expression      переход в состояние 57
-    computable_expression  переход в состояние 58
-    number                 переход в состояние 59
-    negative_number        переход в состояние 60
-
-
-состояние 106
-
-   46 predicate: field_value '<' field_value .
-
-    $default  вывод с использованием правила 46 (predicate)
-
-
-состояние 107
-
-   47 predicate: field_value '>' '=' . field_value
-
-    IDENTIFICATOR    сдвиг, и переход в состояние 45
-    LB               сдвиг, и переход в состояние 80
-    NULL_W           сдвиг, и переход в состояние 48
-    DEFAULT          сдвиг, и переход в состояние 49
-    STRING           сдвиг, и переход в состояние 50
-    POSITIVE_NUMBER  сдвиг, и переход в состояние 51
-    '-'              сдвиг, и переход в состояние 52
-
-    field_value            переход в состояние 112
-    value                  переход в состояние 56
-    number_expression      переход в состояние 57
-    computable_expression  переход в состояние 58
-    number                 переход в состояние 59
-    negative_number        переход в состояние 60
-
-
-состояние 108
-
-   48 predicate: field_value '>' field_value .
-
-    $default  вывод с использованием правила 48 (predicate)
-
-
-состояние 109
-
-   58 number_expression: number_expression . number_operator number_expression
-   58                  | number_expression number_operator number_expression .
-
-    '*'  сдвиг, и переход в состояние 87
-    '+'  сдвиг, и переход в состояние 88
-    '-'  сдвиг, и переход в состояние 89
-    '/'  сдвиг, и переход в состояние 90
-
-    '*'       [вывод с использованием правила 58 (number_expression)]
-    '+'       [вывод с использованием правила 58 (number_expression)]
-    '-'       [вывод с использованием правила 58 (number_expression)]
-    '/'       [вывод с использованием правила 58 (number_expression)]
-    $default  вывод с использованием правила 58 (number_expression)
-
-    number_operator  переход в состояние 91
-
-
-состояние 110
-
-   45 predicate: field_value '<' '=' field_value .
-
-    $default  вывод с использованием правила 45 (predicate)
-
-
-состояние 111
-
-   44 predicate: field_value '<' '>' field_value .
-
-    $default  вывод с использованием правила 44 (predicate)
-
-
-состояние 112
-
-   47 predicate: field_value '>' '=' field_value .
-
-    $default  вывод с использованием правила 47 (predicate)
+   39 number_expression: number_expression . number_operator number_expression
+   39                  | number_expression number_operator number_expression .
+
+    '*'  сдвиг, и переход в состояние 57
+    '+'  сдвиг, и переход в состояние 58
+    '-'  сдвиг, и переход в состояние 59
+    '/'  сдвиг, и переход в состояние 60
+
+    '*'       [вывод с использованием правила 39 (number_expression)]
+    '+'       [вывод с использованием правила 39 (number_expression)]
+    '-'       [вывод с использованием правила 39 (number_expression)]
+    '/'       [вывод с использованием правила 39 (number_expression)]
+    $default  вывод с использованием правила 39 (number_expression)
+
+    number_operator  переход в состояние 61

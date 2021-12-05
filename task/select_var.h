@@ -1,1 +1,0 @@
-extern int line_no = 1;

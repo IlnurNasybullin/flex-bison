@@ -565,7 +565,7 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
 
-#line 32 "select.l"
+#line 30 "select.l"
 
 #line 571 "lex.yy.c"
 
@@ -652,97 +652,97 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 33 "select.l"
+#line 31 "select.l"
 return(SELECT);
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 34 "select.l"
+#line 32 "select.l"
 return(DISTINCT);
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 35 "select.l"
+#line 33 "select.l"
 return(ALL);
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 36 "select.l"
+#line 34 "select.l"
 return(FROM);
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 37 "select.l"
+#line 35 "select.l"
 return(WHERE);
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 38 "select.l"
+#line 36 "select.l"
 return(NOT);
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 39 "select.l"
+#line 37 "select.l"
 return(OR);
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 40 "select.l"
+#line 38 "select.l"
 return(AND);
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 41 "select.l"
+#line 39 "select.l"
 return(NULL_W);
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 42 "select.l"
+#line 40 "select.l"
 return(DEFAULT);
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 43 "select.l"
+#line 41 "select.l"
 return(SQL_END);
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 44 "select.l"
+#line 42 "select.l"
 return(IDENTIFICATOR);
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 45 "select.l"
+#line 43 "select.l"
 return(POSITIVE_NUMBER);
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 46 "select.l"
+#line 44 "select.l"
 return(STRING);
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 47 "select.l"
+#line 45 "select.l"
 return(LB);
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 48 "select.l"
+#line 46 "select.l"
 return(RB);
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 49 "select.l"
+#line 47 "select.l"
 return(COMMA);
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 50 "select.l"
+#line 48 "select.l"
 ;
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 51 "select.l"
+#line 49 "select.l"
 {
 							yylval++;
 							printf("\n");
@@ -750,13 +750,13 @@ YY_RULE_SETUP
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 55 "select.l"
+#line 53 "select.l"
 return(yytext[0]);
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 56 "select.l"
-YY_FATAL_ERROR( "flex scanner jammed" );
+#line 54 "select.l"
+ECHO;
 	YY_BREAK
 #line 762 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
@@ -1644,7 +1644,7 @@ int main()
 	return 0;
 	}
 #endif
-#line 56 "select.l"
+#line 54 "select.l"
 
 void main(int ac, char **av) {
 	if (ac > 2 && strcmp(av[1], "-f") == 0 && (yyin=fopen(av[2], "r")) == NULL) {

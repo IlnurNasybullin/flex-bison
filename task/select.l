@@ -6,8 +6,6 @@ int strcmp(const char* str1, const char* str2);
 extern int yylval = 1;
 %}
 
-%option nodefault
-
 SELECT_W				[Ss][Ee][Ll][Ee][Cc][Tt]
 DISTINCT_W				[Dd][Ii][Ss][Tt][Ii][Nn][Cc][Tt]
 ALL_W					[Aa][Ll][Ll]

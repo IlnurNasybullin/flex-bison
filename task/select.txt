@@ -18,3 +18,5 @@ WHERE (d = (2 + 3) AND (a >= 2 OR (NOT e = "QWERT
 SELECT _A FROM _B WHERE NOT A > 0 AND B < 0 OR A = (3 / 2 + (3 - -321 + 231.3123) + 1 + (2 / 0) - 1);
 SELECT a FROM b WHERE NOT NOT NOT b = c;
 SELECT a FROM b WHERE a < b + c;
+SELECT a FROM b WHERE ((x > y) OR (a <= c) AND (a = r));
+SELECT b from c WHERE a = ((7 - 4) / 4 + -5 * (3 - r) * (2 + 3 / (3 - 5)));
