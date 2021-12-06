@@ -17,7 +17,6 @@
 %token SQL_END
 %{
 #include <stdio.h>
-#include <locale.h>
 
 int yywrap();
 int yylex();
@@ -27,7 +26,7 @@ int has_error = 0;
 void yyerror(char const *s);
 
 void yyerror(char const *s) {
-	printf("%s\n", s);
+	fprintf(stderr, "%s\n", s);
 	has_error = 1;
 }
 
@@ -43,6 +42,12 @@ void printCorrect(int line_num) {
 	has_error = 0;
 }
 %}
+
+%error-verbose
+
+%start select_list
+
+%expect 6
 	
 %%
 select_list:
@@ -53,22 +58,28 @@ select:
 	select_part from_part where_part SQL_END {printCorrect($1);}
 select_part:
 	SELECT field_list |
-	SELECT select_opt field_list
+	SELECT select_opt field_list |
+	error field_list {line_error("expected SELECT keyword", $1); yyerrok;} |
+	error select_opt field_list {line_error("expected SELECT keyword", $1); yyerrok;}
 field_list:
 	'*' |
 	field_names
 field_names:
+	field_name |
 	field_names COMMA field_name |
-	field_name
+	field_names error field_name {line_error("incorrect separator between field names", $2); yyerrok; yyclearin;}
 field_name:
-	IDENTIFICATOR
+	IDENTIFICATOR |
+	error {line_error("incorrect field name", $1); yyerrok; yyclearin;}
 from_part:
 	FROM table_list
 table_list:
+	table_name |
 	table_list COMMA table_name |
-	table_name
+	table_list error table_name {line_error("incorrect separator between table names", $2); yyerrok; yyclearin;}
 table_name:
-	IDENTIFICATOR
+	IDENTIFICATOR |
+	error {line_error("incorrect table name", $1); yyerrok; yyclearin;}
 where_part:
 	WHERE condition
 select_opt:
