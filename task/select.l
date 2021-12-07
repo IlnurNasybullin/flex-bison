@@ -1,21 +1,41 @@
 %{
 #include <stdio.h>
-#define YY_USER_ACTION \
-    yylloc.first_line = yylloc.last_line; \
-    yylloc.first_column = yylloc.last_column; \
-    for(int i = 0; yytext[i] != '\0'; i++) { \
-        if(yytext[i] == '\n') { \
-            yylloc.last_line++; \
-            yylloc.last_column = 0; \
-        } \
-        else { \
-            yylloc.last_column++; \
-        } \
-    }
-	
+#include <string.h>
 #include "select.tab.h"
 
+extern int yylval;
+static int next_column = 1;
+int column = 1;
+
+int yyparse();
+
+#define HANDLE_COLUMN column = next_column; next_column += strlen(yytext)
+
+char *lineptr = NULL;
+size_t n = 0;
+size_t consumed = 0;
+size_t available = 0;	
+
+size_t min(size_t a, size_t b);
 int strcmp(const char* str1, const char* str2);
+
+#define YY_INPUT(buf, result, max_size) {\
+	if (available <= 0) {\
+		consumed = 0;\
+		available = getline(&lineptr, &n, yyin);\
+		if (available < 0) {\
+			if (ferror(yyin)) {\
+				perror("read error:");\
+			}\
+			available = 0;\
+		}\
+	}\
+	result = min(available, max_size);\
+	strncpy(buf, lineptr + consumed, result);\
+	consumed += result;\
+	available -= result;\
+}
+
 %}
 
 %option yylineno
@@ -42,28 +62,30 @@ SYMBOL					{DIGIT}|{LETTER}|{PUNCTUATION_MARK}|{DELIMETER}
 STRING_W				\"({SYMBOL}|.)*\"
 IDENTIFICATOR_W			({LETTER}|_)({LETTER}|_|{DIGIT})*
 %%
-{SELECT_W}				return(SELECT);
-{DISTINCT_W}			return(DISTINCT);
-{ALL_W}					return(ALL);
-{FROM_W}				return(FROM);
-{WHERE_W}				return(WHERE);
-{NOT_W}					return(NOT);
-{OR_W}					return(OR);
-{AND_W}					return(AND);
-{NULL_WW}				return(NULL_W);
-{DEFAULT_W}				return(DEFAULT);
-;						return(SQL_END);
-{IDENTIFICATOR_W}		return(IDENTIFICATOR);
-{POSITIVE_NUMBER_W}		return(POSITIVE_NUMBER);
-{STRING_W}				return(STRING);
-{LB_W}					return(LB);
-{RB_W}					return(RB);
-{COMMA_W}				return(COMMA);
-[ \t\r]					;
+{SELECT_W}				{HANDLE_COLUMN; return(SELECT);}
+{DISTINCT_W}			{HANDLE_COLUMN; return(DISTINCT);}
+{ALL_W}					{HANDLE_COLUMN; return(ALL);}
+{FROM_W}				{HANDLE_COLUMN; return(FROM);}
+{WHERE_W}				{HANDLE_COLUMN; return(WHERE);}
+{NOT_W}					{HANDLE_COLUMN; return(NOT);}
+{OR_W}					{HANDLE_COLUMN; return(OR);}
+{AND_W}					{HANDLE_COLUMN; return(AND);}
+{NULL_WW}				{HANDLE_COLUMN; return(NULL_W);}
+{DEFAULT_W}				{HANDLE_COLUMN; return(DEFAULT);}
+;						{HANDLE_COLUMN; return(SQL_END);}
+{IDENTIFICATOR_W}		{HANDLE_COLUMN; return(IDENTIFICATOR);}
+{POSITIVE_NUMBER_W}		{HANDLE_COLUMN; return(POSITIVE_NUMBER);}
+{STRING_W}				{HANDLE_COLUMN; return(STRING);}
+{LB_W}					{HANDLE_COLUMN; return(LB);}
+{RB_W}					{HANDLE_COLUMN; return(RB);}
+{COMMA_W}				{HANDLE_COLUMN; return(COMMA);}
+[ \t\r]					{HANDLE_COLUMN; }
 \n						{
+							HANDLE_COLUMN;
+							next_column = 1;
 							printf("\n");
 						}
-.						return(yytext[0]);
+.						{HANDLE_COLUMN; return(yytext[0]);}
 %%
 void main(int ac, char **av) {
 	if (ac > 2 && strcmp(av[1], "-f") == 0 && (yyin=fopen(av[2], "r")) == NULL) {
@@ -71,8 +93,12 @@ void main(int ac, char **av) {
 		exit(1);
 	}
 	yyparse();
+	free(lineptr);
 	exit(0);
 } 
 int yywrap() {
 	return(1);
+}
+size_t min(size_t a, size_t b) {
+	return b < a ? b : a;
 }
