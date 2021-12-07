@@ -101,7 +101,8 @@ condition:
 	condition condition_operator condition
 predicate:
 	NOT predicate |
-	field_value comparison field_value
+	field_value comparison field_value |
+	field_value error field_value {yyerrok;}
 comparison:
 	'=' |
 	'<''>' |
@@ -118,7 +119,8 @@ value:
 	STRING |
 	number_expression |
 	NULL_W |
-	DEFAULT
+	DEFAULT |
+	error {yyerrok;}
 number_expression:
 	computable_expression |
 	LB number_expression RB |

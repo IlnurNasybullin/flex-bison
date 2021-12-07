@@ -83,6 +83,7 @@ IDENTIFICATOR_W			({LETTER}|_)({LETTER}|_|{DIGIT})*
 \n						{
 							HANDLE_COLUMN;
 							next_column = 1;
+							yylval++;
 							printf("\n");
 						}
 .						{HANDLE_COLUMN; return(yytext[0]);}
@@ -92,6 +93,7 @@ void main(int ac, char **av) {
 		perror(av[2]);
 		exit(1);
 	}
+	yylval = 1;
 	yyparse();
 	free(lineptr);
 	exit(0);
