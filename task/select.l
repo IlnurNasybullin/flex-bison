@@ -1,10 +1,24 @@
 %{
 #include <stdio.h>
+#define YY_USER_ACTION \
+    yylloc.first_line = yylloc.last_line; \
+    yylloc.first_column = yylloc.last_column; \
+    for(int i = 0; yytext[i] != '\0'; i++) { \
+        if(yytext[i] == '\n') { \
+            yylloc.last_line++; \
+            yylloc.last_column = 0; \
+        } \
+        else { \
+            yylloc.last_column++; \
+        } \
+    }
+	
 #include "select.tab.h"
 
 int strcmp(const char* str1, const char* str2);
-extern int yylval = 1;
 %}
+
+%option yylineno
 
 SELECT_W				[Ss][Ee][Ll][Ee][Cc][Tt]
 DISTINCT_W				[Dd][Ii][Ss][Tt][Ii][Nn][Cc][Tt]
@@ -47,7 +61,6 @@ IDENTIFICATOR_W			({LETTER}|_)({LETTER}|_|{DIGIT})*
 {COMMA_W}				return(COMMA);
 [ \t\r]					;
 \n						{
-							yylval++;
 							printf("\n");
 						}
 .						return(yytext[0]);
