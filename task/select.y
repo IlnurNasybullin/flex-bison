@@ -20,6 +20,7 @@
 
 %{
 #include <stdio.h>
+#include <stdlib.h>
 
 int yywrap();
 int yylex();
@@ -30,6 +31,8 @@ extern int yylineno;
 extern int column;
 extern char *lineptr;
 
+int error_count = 0;
+
 void yyerror(const char *str) {
 	fprintf(stderr, "error: %s in line %d, column %d\n", str, yylineno, column);
 	fprintf(stderr, "%s", lineptr);
@@ -38,18 +41,29 @@ void yyerror(const char *str) {
 	}
 	fprintf(stderr, "^\n");
 	has_error = 1;
+	error_count++;
+	
+	if (error_count >= 3) {
+		exit(-1);
+	}
 }
 
 void line_error(char const *s, int first_line) {
 	printf("Error line: %d - %s\n", first_line, s);
 	has_error = 1;
+	error_count++;
+	
+	if (error_count >= 3) {
+		exit(-1);
+	}
 }
 
 void printCorrect(int first_line) {
 	if (has_error == 0) {
-		printf("Line %d - correct SQL SELECT expression", first_line);
+		printf("Line %d - correct SQL SELECT expression\n", first_line);
 	}
 	has_error = 0;
+	error_count = 0;
 }
 %}
 
@@ -61,23 +75,23 @@ void printCorrect(int first_line) {
 	
 %%
 select_list:
-	select_list select |
-	select
+	select | 
+	select_list select
 select:
 	select_part from_part SQL_END {printCorrect($1);} |
 	select_part from_part where_part SQL_END {printCorrect($1);}
 select_part:
 	SELECT field_list |
 	SELECT select_opt field_list |
-	error field_list {yyerrok;} |
-	error select_opt field_list {yyerrok;}
+	error {yyerrok;} field_list |
+	error {yyerrok;} select_opt field_list
 field_list:
 	'*' |
 	field_names
 field_names:
 	field_name |
 	field_names COMMA field_name |
-	field_names error field_name {yyerrok; yyclearin;}
+	field_names error {yyerrok; yyclearin;} field_name
 field_name:
 	IDENTIFICATOR |
 	error {yyerrok; yyclearin;}
@@ -86,7 +100,7 @@ from_part:
 table_list:
 	table_name |
 	table_list COMMA table_name |
-	table_list error table_name {yyerrok; yyclearin;}
+	table_list error {yyerrok; yyclearin;} table_name
 table_name:
 	IDENTIFICATOR |
 	error {yyerrok; yyclearin;}
@@ -102,7 +116,7 @@ condition:
 predicate:
 	NOT predicate |
 	field_value comparison field_value |
-	field_value error field_value {yyerrok;}
+	field_value error {yyerrok;} field_value
 comparison:
 	'=' |
 	'<''>' |
